@@ -9,5 +9,5 @@ const reportWebVitals = onPerfEntry => {
     });
   }
 };
-
+// 성능 체크용 js
 export default reportWebVitals;
