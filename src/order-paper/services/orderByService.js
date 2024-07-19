@@ -1,12 +1,20 @@
 import axios from "axios";
+import api from "../api/Api";
 
-export const getOrderByListService = async () => {
-    try {
-        const response = await axios.get('http://localhost:8080/api/order-paper/order-by-list');
-        console.log(response.data
-            , "여긴 OrderService.js 에요 ");
-        return response.data;
-    } catch (error) {
-        throw new Error('Your Team is Not found');
+export const getOrderedByListService = (cancelToken) => {
+  return api.get('/order-by-list', {
+    cancelToken
+  }).catch(error => {
+    if (axios.isCancel(error)) {
+      return Promise.reject(new Error("Request was canceled"));
+    } else {
+      return Promise.reject(new Error("Your Team was Cleaned-Up.."))
     }
+  })
 }
+
+const OrderByService = {
+  getOrderedByListService,
+}
+
+export default OrderByService;

@@ -1,16 +1,17 @@
-import logo from './logo.svg';
 import './App.css';
-import OrderPage from "./order-paper/containers/OrderPage";
+import {HashRouter, Route, Routes} from "react-router-dom";
+import React from "react";
+
+const DefaultLayout = React.lazy(() => import('./order-paper/layout/DefaultLayout'));
 
 function App() {
-    return (
-        <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo"/>
-                <OrderPage/>
-            </header>
-        </div>
-    );
+  return (
+      <HashRouter>
+        <Routes>
+          <Route path="*" name="Home" element={<DefaultLayout/>}/>
+        </Routes>
+      </HashRouter>
+  );
 }
 
 export default App;

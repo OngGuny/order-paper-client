@@ -14,6 +14,9 @@
 }
 
 .App-header {
+    background-image: url('../public/assets/4.jpg');
+    background-size: cover;
+    background-position: center;
     background-color: #282c34;
     min-height: 100vh;
     display: flex;
@@ -21,7 +24,7 @@
     align-items: center;
     justify-content: center;
     font-size: calc(10px + 2vmin);
-    color: white;
+    color: #a4a4a4;
 }
 
 .App-link {

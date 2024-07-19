@@ -1,44 +1,60 @@
 import {useEffect, useState} from "react";
-import {getOrderByListService} from "../services/orderByService";
+import OrderByService from "../services/orderByService";
 import AbsentList from "./AbsentList";
-import TeamMembers from "./TeamMembers";
+import TeamMembers from "./draggable/TeamMembers";
 import OrderSheet from "./OrderSheet";
+import axios from "axios";
+import {Box, Card, CardContent} from "@mui/material";
 
 const TemptOrderPage = () => {
-    const [orderByList, setOrderByList] = useState([]);
-    const [absentList, setAbsentList] = useState([]);
+  const [orderedByList, setOrderedByList] = useState([]);
+  const [absentList, setAbsentList] = useState([]);
 
-    useEffect(() => {
-        const getOrderByList = async () => {
-            try {
-                const orderByList = await getOrderByListService();
-                setOrderByList(orderByList);
-            } catch (error) {
-                console.error('Failed to fetch OrderByList', error);
-            }
-        };
-        getOrderByList();
-    }, []);
+  useEffect(() => {
+    const cancelTokenSource = axios.CancelToken.source();
 
-    const handleOrderByToggle = (orderBy) => {
-        const isAbsent = absentList.some(absentee => absentee.id === orderBy.id);
+    OrderByService.getOrderedByListService(cancelTokenSource.token)
+    .then(response => {
+      setOrderedByList(response.data);
+    })
+    .catch(error => {
+      if (axios.isCancel(error)) {
+        console.log("Request canceled", error.message);
+      } else {
+        console.error(error);
+      }
+    });
 
-        if (isAbsent) {
-            setAbsentList(absentList.filter(absentee => absentee !== orderBy));
-        } else {
-            setAbsentList([...absentList, orderBy]);
-        }
-    };
-    return (
-        <div>
+    return () => {
+      cancelTokenSource.cancel("Component unmounted");
+    }
+
+  }, []);
+
+  const handleOrderedByToggle = (orderedBy) => {
+    const isAbsent = absentList.some(absentee => absentee.id === orderedBy.id);
+
+    if (isAbsent) {
+      setAbsentList(absentList.filter(absentee => absentee !== orderedBy));
+    } else {
+      setAbsentList([...absentList, orderedBy]);
+    } //todo fix
+  };
+  return (
+      <Box sx={{display: 'flex', justifyContent: 'center', transform: 'translateX(-50px)'}}>
+        <Card variant="outlined">
+          <CardContent>
             <AbsentList absentList={absentList}/>
             <TeamMembers
-                orderByList={orderByList}
-                handleOrderByToggle={handleOrderByToggle}
+                orderByList={orderedByList}
+                setOrderedByList={setOrderedByList}
+                handleOrderedByToggle={handleOrderedByToggle}
                 absentList={absentList}
             />
-            <OrderSheet orderByList={orderByList}/>
-        </div>
-    );
+            <OrderSheet orderedByList={orderedByList} absentList={absentList}/>
+          </CardContent>
+        </Card>
+      </Box>
+  );
 }
 export default TemptOrderPage;
